@@ -14,9 +14,19 @@ Installing dependencies is easy. Just use ``pip install tensorflow numpy matplot
 ## Repository structure
 
 * ``logictensornetworks.py`` -- core system for defining constants, variables, predicates, functions and formulas.
-* ``logictensornetworks_wrapper.py`` -- a simple wrapper that allows to express constants, variables, predicates, functions and formulas using strings. 
+* ``logictensornetworks_wrapper.py`` -- a simple wrapper that allows to express constants, variables, predicates, functions and formulas using strings.
 * ``logictensornetworks_library.py`` -- a collection of useful functions.
 * ``*.ipynb`` are jupyter notebooks
+
+
+# Examples
+
+* [regression linear](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/regression_linear.ipynb)
+* [binary classification](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/binary_classification.ipynb)
+* [multilabel classification](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/multilabel_classification.ipynb)
+* [multilabel classification axiomatized](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/multilabel_classification_axiomatized.ipynb)
+* [relations](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/relations.ipynb)
+* [smokes/friends/cancer](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/smokes_friends_cancer.ipynb)
 
 ## Documentation
 
