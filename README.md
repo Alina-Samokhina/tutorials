@@ -22,6 +22,7 @@ Installing dependencies is easy. Just use ``pip install tensorflow numpy matplot
 # Tutorials
 
 * [grounding](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/grounding.ipynb)
+* [grounding quantifiers](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/grounding_quantifiers.ipynb)
 * [regression linear](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/regression_linear.ipynb)
 * [binary classification](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/binary_classification.ipynb)
 * [multilabel classification](https://nbviewer.jupyter.org/github/logictensornetworks/tutorials/blob/master/multilabel_classification.ipynb)
