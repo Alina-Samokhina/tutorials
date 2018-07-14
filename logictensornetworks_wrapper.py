@@ -24,7 +24,7 @@ TERMS={}
 FORMULAS={}
 
 def _reset():
-    global CONSTANTS,PREDICATES,VARIABLES,FUNCTIONS,CLAUSES
+    global CONSTANTS,PREDICATES,VARIABLES,FUNCTIONS,TERMS,FORMULAS
     CONSTANTS={}
     PREDICATES={}
     VARIABLES={}
@@ -314,7 +314,7 @@ def initialize_knowledgebase(keep_session=True,
         sat_level = SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
         if  initial_sat_level_threshold is not None and sat_level >= initial_sat_level_threshold:
             break
-        if i % 100 == 0:
+        if track_sat_levels is not None and i % track_sat_levels == 0:
             logging.getLogger(__name__).info("INITIALIZE %s sat level -----> %s" % (i,sat_level))
     logging.getLogger(__name__).info("INITIALIZED with sat level = %s" % (sat_level))
 
