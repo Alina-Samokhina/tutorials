@@ -278,6 +278,13 @@ def _compute_feed_dict(feed_dict):
 SESSION=None
 OPTIMIZER=None
 KNOWLEDGEBASE=None
+
+def initialize_tf_session():
+    global SESSION
+    logging.getLogger(__name__).info("Initializing Tensorflow session")
+    SESSION = tf.Session()
+    SESSION.run(tf.global_variables_initializer())
+    
 def initialize_knowledgebase(keep_session=True,
     optimizer=None,
     formula_aggregator=lambda *x: tf.reduce_mean(tf.concat(x,axis=0)),
@@ -303,19 +310,18 @@ def initialize_knowledgebase(keep_session=True,
 
     logging.getLogger(__name__).info("Assembling feed dict")
     _feed_dict=_compute_feed_dict(feed_dict)
-    logging.getLogger(__name__).info("Initializing Tensorflow session")
-    SESSION = tf.Session()
-    init = tf.global_variables_initializer()
-    SESSION.run(init)
+
+    initialize_tf_session()
+
     sat_level = SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
     i=0
     for i in range(max_trials):
-        SESSION.run(init,feed_dict=_feed_dict)
-        sat_level = SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
         if  initial_sat_level_threshold is not None and sat_level >= initial_sat_level_threshold:
             break
         if track_sat_levels is not None and i % track_sat_levels == 0:
             logging.getLogger(__name__).info("INITIALIZE %s sat level -----> %s" % (i,sat_level))
+        initialize_tf_session()
+        sat_level = SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
     logging.getLogger(__name__).info("INITIALIZED with sat level = %s" % (sat_level))
 
 
@@ -323,6 +329,7 @@ def train(max_epochs=10000,
         track_sat_levels=100,
         sat_level_epsilon=.99,
         feed_dict={}):
+    """ Optimize the knowledgebase """
     global SESSION,OPTIMIZER,KNOWLEDGEBASE
     if SESSION is None or OPTIMIZER is None:        
         raise Exception("Knowledgebase not initialized.")
@@ -333,7 +340,6 @@ def train(max_epochs=10000,
         
         if track_sat_levels is not None and i % track_sat_levels == 0:
             logging.getLogger(__name__).info("TRAINING %s sat level -----> %s" % (i,sat_level))
-            # print("TRAINING %s sat level -----> %s" % (i,sat_level))
         if sat_level_epsilon is not None and sat_level > sat_level_epsilon:
             break
         
@@ -342,9 +348,8 @@ def train(max_epochs=10000,
     return sat_level
 
 def ask(term_or_formula,feed_dict={}):
+    """ Evaluate a term or formula. Allows to pass a feed_dict """
     global SESSION
-    if SESSION is None:
-        raise Exception("Knowledgebase not initialized.")
     _t = None
     try:
         _t=_build_formula(_parse_formula(term_or_formula))
@@ -357,6 +362,7 @@ def ask(term_or_formula,feed_dict={}):
     if _t is None:
         raise Exception('Could not parse and build term/formula for "%s"' % term_or_formula)
     else:
+        if SESSION is None:
+            initialize_tf_session()
         _feed_dict=_compute_feed_dict(feed_dict)
-
         return SESSION.run(_t,feed_dict=_feed_dict)
