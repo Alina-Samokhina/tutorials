@@ -352,19 +352,19 @@ def train(max_epochs=10000,
 
     if tf.global_variables():    
         for i in range(max_epochs):
-            sat_level=SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
-            
             if track_sat_levels is not None and i % track_sat_levels == 0:
+                sat_level=SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
                 logging.getLogger(__name__).info("TRAINING %s sat level -----> %s" % (i,sat_level))
-                # print("TRAINING %s sat level -----> %s" % (i,sat_level))
-            if sat_level_epsilon is not None and sat_level > sat_level_epsilon:
-                break
+                if sat_level_epsilon is not None and sat_level > sat_level_epsilon:
+                    logging.getLogger(__name__).info("TRAINING finished after %s epochs with sat level %s" % (i,sat_level))
+                    return sat_level
             
             SESSION.run(OPTIMIZER,feed_dict=_feed_dict)
+        sat_level=SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
         logging.getLogger(__name__).info("TRAINING finished after %s epochs with sat level %s" % (i,sat_level))
         return sat_level
     else:
-        logger.warn("Nothing to optimize/train. Skipping training")
+        logging.getLogger(__name__).warn("Nothing to optimize/train. Skipping training")
         return SESSION.run(KNOWLEDGEBASE,feed_dict=_feed_dict)
 
 def ask(term_or_formula,feed_dict={}):
@@ -387,6 +387,28 @@ def ask(term_or_formula,feed_dict={}):
 
         return SESSION.run(_t,feed_dict=_feed_dict)
 
+def ask_m(terms_or_formulas,feed_dict={}):
+    global SESSION
+    if SESSION is None:
+        initialize_tf_session()
+    _ts=[]
+    for term_or_formula in terms_or_formulas:
+        _t = None
+        try:
+            _t=_build_formula(_parse_formula(term_or_formula))
+        except:
+            pass
+        try:
+            _t=_build_term(_parse_term(term_or_formula))
+        except:
+            pass
+        if _t is None:
+            raise Exception('Could not parse and build term/formula for "%s"' % term_or_formula)
+        else:
+            _ts.append(_t)
+    _feed_dict=_compute_feed_dict(feed_dict)
+    return SESSION.run(_ts,feed_dict=_feed_dict)
+
 def _reset():
     global CONSTANTS,PREDICATES,VARIABLES,FUNCTIONS,TERMS,FORMULAS,AXIOMS
     global KNOWLEDGEBASE,SESSION,OPTIMIZER
@@ -401,3 +423,4 @@ def _reset():
         SESSION.close()
     SESSION=None
     OPTIMIZER=None
+
